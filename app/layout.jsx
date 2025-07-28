@@ -1,11 +1,6 @@
-import '../styles/globals.css';
+"use client";
 
-export const metadata = {
-    title: {
-        template: '%s | Netlify',
-        default: 'Netlify Starter'
-    }
-};
+import '../styles/globals.css';
 
 export default function RootLayout({ children }) {
     /**
