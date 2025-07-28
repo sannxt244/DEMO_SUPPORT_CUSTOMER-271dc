@@ -39,10 +39,16 @@ export default function RootLayout({ children }) {
             src: `https://testcdnamisapp.misacdn.net/support/libs/chat-customer-0.0.0/core.js`,
             type: 'text/javascript',
             onload: async () => {
-                window.initAmisSupport({
-                    clientId: '1',
-                    identityId: getSessionUUID(),
-                    environment: 'TestOnline'
+                _loadSource('script', {
+                    src: `https://testcdnamisapp.misacdn.net/support/config/config.testonline.js`,
+                    type: 'text/javascript',
+                    onload: async () => {
+                        window.initAmisSupport({
+                            clientId: '1',
+                            identityId: getSessionUUID(),
+                            environment: 'TestOnline'
+                        });
+                    }
                 });
             }
         });
