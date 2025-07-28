@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
                         <main className="grow">{children}</main>
                     </div>
                 </div>
-                <script type="module" src="script.js"></script>
+                {/* <script type="module" src="script.js"></script> */}
             </body>
         </html>
     );
