@@ -23,6 +23,7 @@ export default function RootLayout({ children }) {
                         <Footer />
                     </div>
                 </div>
+                <script type="module" src="script.js"></script>
             </body>
         </html>
     );
