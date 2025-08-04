@@ -1,8 +1,0 @@
-#chat-window-id > div.flex.flex-col.gap-2.bg-neutral-50 > div > div > div {
-  color: #1F1F1F;
-}
-
-#chat-window-id > div.absolute.top-16.left-0.right-0 > div > div > div {
-      background-color: white;
-      border-radius: 12px;
-}

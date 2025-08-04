@@ -36,7 +36,7 @@ export default function RootLayout({ children }) {
         }
 
         _loadSource('script', {
-            src: `https://testcdnamisapp.misacdn.net/support/libs/chat-customer-0.0.0/core.js`,
+            src: `https://testcdnamisapp.misacdn.net/support/core/2.0.0/core.js`,
             type: 'text/javascript',
             onload: async () => {
                 window.initAmisSupport({
