@@ -40,7 +40,7 @@ export default function RootLayout({ children }) {
             type: 'text/javascript',
             onload: async () => {
                 window.initAmisSupport({
-                    clientId: '1',
+                    clientId: '9ad06c08-71dd-11f0-912f-005056a60cf9',
                     identityId: getSessionUUID(),
                     environment: 'TestOnline'
                 });
