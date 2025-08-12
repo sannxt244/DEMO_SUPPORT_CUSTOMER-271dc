@@ -36,16 +36,18 @@ export default function RootLayout({ children }) {
         }
 
         _loadSource('script', {
-            src: `https://testcdnamisapp.misacdn.net/support/libs/chat-customer-0.0.0/core.js`,
+            src: `https://testcdnamisapp.misacdn.net/support/core/1.0.0/core.js`,
             type: 'text/javascript',
             onload: async () => {
                 window.initAmisSupport({
                     clientId: '9ad06c08-71dd-11f0-912f-005056a60cf9',
-                    identityId: getSessionUUID(),
-                    environment: 'TestOnline'
+                    identityId: getSessionUUID()
                 });
             }
         });
     }, []);
-    return <div className="flex flex-col min-h-screen px-6 bg-noise sm:px-12">Hello</div>;
+    return <div className="flex flex-col min-h-screen px-6 bg-noise sm:px-12">
+        <input type="file" id="fileProfile1" name="fileProfile1"  accept="image/png,image/jpeg" capture="filesystem" />
+        <input type="file" id="fileProfile2" name="fileProfile2"  capture="filesystem" />
+    </div>;
 }
