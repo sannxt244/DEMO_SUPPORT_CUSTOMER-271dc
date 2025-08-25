@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+// import { LiveChatWidget, LivechatWidget } from '@livechat/widget-react';
 
 export default function RootLayout({ children }) {
     useEffect(() => {
@@ -40,24 +41,16 @@ export default function RootLayout({ children }) {
             type: 'text/javascript',
             onload: async () => {
                 window.initAmisSupport({
-                    clientId: '9ad06c08-71dd-11f0-912f-005056a60cf9',
-                    identityId: getSessionUUID(),
-                    fullname: 'Trần Dần'
+                    clientId: '70e54549-91a6-41c9-ac2c-5df7dfb267de',
+                    identityId: getSessionUUID()
                 });
             }
         });
     }, []);
+
     return (
         <div className="flex flex-col min-h-screen px-6 bg-noise sm:px-12">
-            <input
-                type="file"
-                id="fileProfile1"
-                name="fileProfile1"
-                accept="image/png,image/jpeg"
-                capture="filesystem"
-            />
-            <input type="file" id="fileProfile2" name="fileProfile2" capture="filesystem" />
-            <input type="file" id="fileProfile2" name="fileProfile2" />
+            {/* <LiveChatWidget license="19273572" /> */}
         </div>
     );
 }
