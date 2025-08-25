@@ -41,7 +41,7 @@ export default function RootLayout({ children }) {
             type: 'text/javascript',
             onload: async () => {
                 window.initAmisSupport({
-                    clientId: '70e54549-91a6-41c9-ac2c-5df7dfb267de',
+                    clientId: '1',
                     identityId: getSessionUUID()
                 });
             }
