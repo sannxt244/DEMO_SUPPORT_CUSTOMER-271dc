@@ -1,30 +1,32 @@
-<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <style>
-    .favicon-center-dot {
-      fill: #014847;
-    }
-
-    .favicon-lines {
-      fill: #05BDBA;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      .favicon-center-dot {
-        fill: #fff;
-      }
-
-      .favicon-lines {
-        fill: #05BDBA;
-      }
-    }
-  </style>
-  <path class="favicon-center-dot" stroke="none" d="M17.9922 18.3225H14.005L13.6746 17.9921V14.005L14.005 13.6746H17.9922L18.3226 14.005V17.9921L17.9922 18.3225Z" />
-  <g class="favicon-lines" stroke="none">
-    <path d="M9.6958 24.3311H9.35705L7.6661 22.6401V22.3041L10.2511 19.7164L12.042 19.7191L12.2808 19.9552V21.7461L9.6958 24.3311Z" />
-    <path d="M7.6661 9.69576V9.35701L9.35705 7.66606H9.6958L12.2808 10.2511V12.0392L12.042 12.2808H10.2511L7.6661 9.69576Z" />
-    <path d="M10.0457 17.4369H0.205466L0 17.2314V14.7658L0.205466 14.5603H10.0457L10.2511 14.7658V17.2314L10.0457 17.4369Z" />
-    <path d="M31.7945 17.4369H21.9544L21.7489 17.2314V14.7658L21.9544 14.5603H31.7945L32 14.7658V17.2314L31.7945 17.4369Z" />
-    <path d="M14.5631 10.0456V2.66547L14.7686 2.46001H17.2343L17.4396 2.66547V10.0456L17.2343 10.2511H14.7686L14.5631 10.0456Z" />
-    <path d="M14.5631 29.3316V21.9515L14.7686 21.746H17.2343L17.4396 21.9515V29.3316L17.2343 29.5371H14.7686L14.5631 29.3316Z" />
+<svg xmlns="http://www.w3.org/2000/svg" width="34" height="35" viewBox="0 0 34 35" fill="none">
+  <defs>
+    <!-- Thêm random suffix vào ID để tránh conflict -->
+    <filter id="filter0_dd_amis_{{random}}" x="0" y="0" width="34" height="35" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="1"/>
+      <feGaussianBlur stdDeviation="0.5"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.16 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2239_20645"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset/>
+      <feGaussianBlur stdDeviation="0.5"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0"/>
+      <feBlend mode="normal" in2="effect1_dropShadow_2239_20645" result="effect2_dropShadow_2239_20645"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_2239_20645" result="shape"/>
+    </filter>
+    <linearGradient id="paint0_linear_amis_{{random}}" x1="17" y1="1" x2="17" y2="33" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0DD57D"/>
+      <stop offset="1" stop-color="#0FA976"/>
+    </linearGradient>
+  </defs>
+  <g filter="url(#filter0_dd_amis_{{random}})">
+    <path d="M1 17C1 4.2 4.2 1 17 1C29.8 1 33 4.2 33 17C33 29.8 29.8 33 17 33C4.2 33 1 29.8 1 17Z" fill="url(#paint0_linear_amis_{{random}})"/>
   </g>
+  <path d="M17 8.20001C20.916 8.20001 24.2325 10.7586 25.374 14.2947C26.1253 14.9545 26.6005 15.9214 26.6006 16.9998C26.6006 18.078 26.125 19.0441 25.374 19.7039C24.2328 23.2407 20.9164 25.7996 17 25.7996C13.0835 25.7995 9.76599 23.2408 8.625 19.7039C7.87458 19.0442 7.40039 18.0776 7.40039 16.9998C7.40045 15.9218 7.87423 14.9545 8.625 14.2947C9.76637 10.7585 13.084 8.20017 17 8.20001ZM17 11.4002C13.9077 11.4005 11.4006 13.9075 11.4004 16.9998C11.4004 19.9957 13.7534 22.4424 16.7119 22.5926L17 22.6004H22.6006L20.9316 20.9861C21.9611 19.9707 22.6006 18.5601 22.6006 16.9998C22.6004 13.9073 20.0926 11.4002 17 11.4002Z" fill="white"/>
+  <circle cx="14.9998" cy="17" r="1.2" fill="white"/>
+  <circle cx="18.9998" cy="17" r="1.2" fill="white"/>
+
 </svg>
