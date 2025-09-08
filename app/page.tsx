@@ -130,7 +130,7 @@ export default function RootLayout() {
             company: '',
             taxcode: '',
             clientId: '2f4195dc-83fd-11f0-912f-005056a60cf9',
-            identityId: getSessionUUID(),
+            identityId: '',
             showTrigger: false,
             source: 'AMIS_SUPPORT'
         }
@@ -140,6 +140,7 @@ export default function RootLayout() {
 
     async function onSubmit() {
         if (_window && _window.initAmisSupport) {
+            form.setValue('identityId', getSessionUUID());
             await _window.initAmisSupport(form.getValues());
             _window.AmisSupport.ChatWindow.show();
         } else if (_window?.AmisSupport?.ChatWindow) {
