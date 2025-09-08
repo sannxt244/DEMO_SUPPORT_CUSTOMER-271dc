@@ -234,8 +234,10 @@ export default function RootLayout() {
                             <Button
                                 onClick={async () => {
                                     const valid = await form.trigger();
-                                    if (valid) onSubmit();
-                                    setIsShowDialog(false);
+                                    if (valid) {
+                                        onSubmit();
+                                        setIsShowDialog(false);
+                                    }
                                 }}
                             >
                                 Tiếp tục
