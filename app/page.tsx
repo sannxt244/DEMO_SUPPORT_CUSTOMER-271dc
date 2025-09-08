@@ -91,6 +91,7 @@ const FormSchema = z.object({
     showTrigger: z.boolean().optional(),
     clientId: z.string(),
     identityId: z.string(),
+    source: z.string(),
     fullname: z.string().min(1, 'Họ và tên không được để trống'),
     mobile: z.string().min(1, 'Số điện thoại không được để trống'),
     email: z.email('Email không hợp lệ').or(z.literal('')),
@@ -130,7 +131,8 @@ export default function RootLayout() {
             taxcode: '',
             clientId: '2f4195dc-83fd-11f0-912f-005056a60cf9',
             identityId: getSessionUUID(),
-            showTrigger: false
+            showTrigger: false,
+            source: 'AMIS_SUPPORT'
         }
     });
 
