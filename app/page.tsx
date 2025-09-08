@@ -103,6 +103,23 @@ export default function RootLayout() {
 
     const _window = typeof window !== 'undefined' ? (window as any) : null;
 
+    function getSessionUUID() {
+        // Định nghĩa key để lưu trong sessionStorage
+        const uuidKey = 'session_uuid';
+        // Thử lấy UUID từ sessionStorage
+        let sessionUUID = sessionStorage.getItem(uuidKey);
+        // Nếu chưa có UUID trong session này
+        if (!sessionUUID) {
+            // Tạo một UUID mới bằng API của trình duyệt
+            sessionUUID = crypto.randomUUID();
+
+            // Lưu UUID mới vào sessionStorage
+            sessionStorage.setItem(uuidKey, sessionUUID);
+        }
+        // Trả về UUID
+        return sessionUUID;
+    }
+
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
@@ -111,8 +128,8 @@ export default function RootLayout() {
             mobile: '',
             company: '',
             taxcode: '',
-            clientId: '1',
-            identityId: '1',
+            clientId: '2f4195dc-83fd-11f0-912f-005056a60cf9',
+            identityId: getSessionUUID(),
             showTrigger: false
         }
     });

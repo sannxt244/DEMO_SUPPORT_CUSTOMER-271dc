@@ -15,7 +15,8 @@ export default function RootLayout({ children }) {
                 <link rel="icon" href="/favicon.svg" sizes="any" />
             </head>
             <body className="min-h-screen">{children}</body>
-            <Script src="https://testcdnamisapp.misacdn.net/support/core/1.0.0-testonline/core.js"></Script>
+            {/* <Script src="https://testcdnamisapp.misacdn.net/support/core/1.0.0-testonline/core.js"></Script> */}
+            <Script src="https://support-misa.misacdn.net/1.0.0-release/core.js"></Script>
         </html>
     );
 }
