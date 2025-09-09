@@ -151,7 +151,7 @@ export default function RootLayout() {
 
     return (
         <div className="p-4">
-            <h3>MEINVOCE</h3>
+            <h3>MEINVOICE</h3>
             <Dialog
                 open={isShowDialog}
                 onOpenChange={() => {
