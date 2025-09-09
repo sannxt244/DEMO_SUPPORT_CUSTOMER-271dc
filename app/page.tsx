@@ -105,6 +105,7 @@ export default function RootLayout() {
     const _window = typeof window !== 'undefined' ? (window as any) : null;
 
     function getSessionUUID() {
+        return crypto.randomUUID(); 
         // Định nghĩa key để lưu trong sessionStorage
         const uuidKey = 'session_uuid';
         // Thử lấy UUID từ sessionStorage
