@@ -33,8 +33,13 @@ export default function RootLayout() {
                     taxcode: '1'
                 });
 
-                (window as any).AmisSupport?.ChatWindow?.on('new_message', (data) => { console.log(data)})
-                (window as any).AmisSupport?.ChatWindow?.on('update_unread', (data) => { console.log(data)})
+                setTimeout(() => {
+                    (window as any).AmisSupport?.ChatWindow?.on('new_message', (data) => {
+                        console.log(data);
+                    })(window as any).AmisSupport?.ChatWindow?.on('update_unread', (data) => {
+                        console.log(data);
+                    });
+                }, 100);
             }
         });
     }, []);
