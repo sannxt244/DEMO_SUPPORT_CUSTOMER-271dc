@@ -22,7 +22,7 @@ export default function RootLayout() {
             src: `https://testcdnamisapp.misacdn.net/support/core/1.0.0-testonline/core.js`,
             type: 'text/javascript',
             onload: async () => {
-                (window as any).initAmisSupport({
+                await (window as any).initAmisSupport({
                     clientId: '9ad06c08-71dd-11f0-912f-005056a60cf9',
                     company: '1',
                     email: '1',
