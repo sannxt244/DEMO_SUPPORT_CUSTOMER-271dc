@@ -32,6 +32,9 @@ export default function RootLayout() {
                     source: '1',
                     taxcode: '1'
                 });
+
+                (window as any).AmisSupport?.ChatWindow?.on('new_message', (data) => { console.log(data)})
+                (window as any).AmisSupport?.ChatWindow?.on('update_unread', (data) => { console.log(data)})
             }
         });
     }, []);
