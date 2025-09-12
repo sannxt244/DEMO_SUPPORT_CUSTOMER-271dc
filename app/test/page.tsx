@@ -21,8 +21,8 @@ export default function RootLayout() {
         _loadSource('script', {
             src: `https://testcdnamisapp.misacdn.net/support/core/1.0.0-testonline/core.js`,
             type: 'text/javascript',
-            onload: async () => {
-                await (window as any).initAmisSupport({
+            onload: () => {
+                (window as any).initAmisSupport({
                     clientId: '9ad06c08-71dd-11f0-912f-005056a60cf9',
                     company: '1',
                     email: '1',
@@ -33,13 +33,11 @@ export default function RootLayout() {
                     taxcode: '1'
                 });
 
-                setTimeout(() => {
-                    (window as any).AmisSupport?.ChatWindow?.on('new_message', (data) => {
-                        console.log(data);
-                    })(window as any).AmisSupport?.ChatWindow?.on('update_unread', (data) => {
-                        console.log(data);
-                    });
-                }, 100);
+                (window as any).AmisSupport?.ChatWindow?.on('new_message', (data) => {
+                    console.log(data);
+                })(window as any).AmisSupport?.ChatWindow?.on('update_unread', (data) => {
+                    console.log(data);
+                });
             }
         });
     }, []);
