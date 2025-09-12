@@ -33,9 +33,12 @@ export default function RootLayout() {
                     taxcode: '1'
                 });
 
-                (window as any).AmisSupport?.ChatWindow?.on('new_message', (data) => {
+                const amisSupport = (window as any).AmisSupport;
+                console.log('amisSupport', amisSupport);
+                amisSupport.ChatWindow?.on('new_message', (data) => {
                     console.log(data);
-                })(window as any).AmisSupport?.ChatWindow?.on('update_unread', (data) => {
+                });
+                amisSupport.ChatWindow?.on('update_unread', (data) => {
                     console.log(data);
                 });
             }
