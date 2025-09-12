@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 
-export default function RootLayout({ children }) {
+export default function RootLayout() {
     useEffect(() => {
         /**
          * Load file
