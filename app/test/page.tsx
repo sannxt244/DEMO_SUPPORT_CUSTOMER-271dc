@@ -24,14 +24,15 @@ export default function RootLayout() {
             type: 'text/javascript',
             onload: () => {
                 (window as any).initAmisSupport({
-                    clientId: '9ad06c08-71dd-11f0-912f-005056a60cf9',
+                    // clientId: '9ad06c08-71dd-11f0-912f-005056a60cf9',
+                    clientId: '1',
                     company: '1',
                     email: '1',
                     fullname: '1',
                     identityId: '1',
                     mobile: '1',
                     source: '1',
-                    taxcode: '1',
+                    taxcode: '0108767234',
                     showTrigger: false
                 });
 
