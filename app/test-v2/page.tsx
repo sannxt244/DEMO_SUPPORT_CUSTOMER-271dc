@@ -20,11 +20,11 @@ export default function RootLayout() {
         }
 
         _loadSource('script', {
-            src: `https://testcdnamisapp.misacdn.net/support/core/2.0.0-testonline/core.js`,
+            src: `https://amismisa.misacdn.net/support/core/1.0.0-release/core.js`,
             type: 'text/javascript',
             onload: () => {
                 const AmisSupport = (window as any).AmisSupport;
-                AmisSupport.init({
+                initAmisSupport({
                     clientId: '9ad06c08-71dd-11f0-912f-005056a60cf9',
                     company: '1',
                     email: '1',
@@ -33,6 +33,10 @@ export default function RootLayout() {
                     mobile: '1',
                     source: '1',
                     taxcode: '1'
+                });
+
+                AmisSupport.on('update_unread', (data) => {
+                    debugger
                 });
             }
         });
