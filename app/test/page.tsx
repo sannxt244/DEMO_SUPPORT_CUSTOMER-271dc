@@ -28,7 +28,7 @@ export default function RootLayout() {
                     clientId: '1',
                     company: '1',
                     email: '1',
-                    fullname: '1',
+                    fullname: 'Lê Hoàng Hiếu Nghĩa Đệ Nhất Thương Tâm Nhân Lê Hoàng Hiếu Nghĩa Đệ Nhất Thương Tâm Nhân Lê Hoàng Hiếu Nghĩa Đệ Nhất Thương Tâm Nhân Lê Hoàng Hiếu Nghĩa Đệ Nhất Thương Tâm Nhân Lê Hoàng Hiếu Nghĩa Đệ Nhất Thương Tâm Nhân Lê Hoàng Hiếu Nghĩa Đệ Nhất Thương Tâm Nhân',
                     identityId: '1',
                     mobile: '1',
                     source: '1',
