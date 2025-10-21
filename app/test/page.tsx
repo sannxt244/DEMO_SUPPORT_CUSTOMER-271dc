@@ -33,6 +33,7 @@ export default function RootLayout() {
                     mobile: '1',
                     source: '1',
                     taxcode: '0108767234',
+                    blacklistQueryParams: ['token']
                 });
 
                 const amisSupport = (window as any).AmisSupport;
