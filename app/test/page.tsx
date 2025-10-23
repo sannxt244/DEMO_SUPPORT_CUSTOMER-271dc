@@ -20,7 +20,7 @@ export default function RootLayout() {
         }
 
         _loadSource('script', {
-            src: `https://testcdnamisapp.misacdn.net/support/core/1.0.0-testonline/core.js`,
+            src: `https://testcdnamisapp.misacdn.net/support/core/2.0.0-testonline/core.js`,
             type: 'text/javascript',
             onload: () => {
                 (window as any).initAmisSupport({
