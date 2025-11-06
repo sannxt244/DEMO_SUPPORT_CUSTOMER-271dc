@@ -76,6 +76,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import Script from 'next/script';
 
 interface InitRequestDTO {
     clientId: string;
@@ -105,7 +106,7 @@ export default function RootLayout() {
     const _window = typeof window !== 'undefined' ? (window as any) : null;
 
     function getSessionUUID() {
-        return crypto.randomUUID(); 
+        return crypto.randomUUID();
         // Định nghĩa key để lưu trong sessionStorage
         const uuidKey = 'session_uuid';
         // Thử lấy UUID từ sessionStorage
@@ -150,123 +151,126 @@ export default function RootLayout() {
     }
 
     return (
-        <div className="p-4">
-            <Dialog
-                open={isShowDialog}
-                onOpenChange={() => {
-                    if (_window && _window.AmisSupport && _window.AmisSupport.ChatWindow) {
-                        _window.AmisSupport.ChatWindow.show();
-                        return;
-                    }
+        <>
+            <Script src="https://support-misa.misacdn.net/1.0.0-release/core.js"></Script>
+            <div className="p-4">
+                <Dialog
+                    open={isShowDialog}
+                    onOpenChange={() => {
+                        if (_window && _window.AmisSupport && _window.AmisSupport.ChatWindow) {
+                            _window.AmisSupport.ChatWindow.show();
+                            return;
+                        }
 
-                    setIsShowDialog(true);
-                }}
-            >
-                <DialogTrigger asChild>
-                    <Button variant="outline">Tư vấn ngay</Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle>Điền thông tin</DialogTitle>
-                        <DialogDescription>Điền các thông tin sau để bắt đầu tư vấn.</DialogDescription>
-                    </DialogHeader>
-                    <Form {...form}>
-                        <FormField
-                            control={form.control}
-                            name="fullname"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        Họ và tên <span className="text-red-500">*</span>
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Nhập họ và tên..." {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Email</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Nhập email..." {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="mobile"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        Số điện thoại
-                                        <span className="text-red-500">*</span>
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Nhập số điện thoại..." {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="company"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        Tên công ty
-                                        <span className="text-red-500">*</span>
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Nhập tên công ty..." {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="taxcode"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        Mã số thuế
-                                        <span className="text-red-500">*</span>
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Nhập mã số thuế..." {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        setIsShowDialog(true);
+                    }}
+                >
+                    <DialogTrigger asChild>
+                        <Button variant="outline">Tư vấn ngay</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle>Điền thông tin</DialogTitle>
+                            <DialogDescription>Điền các thông tin sau để bắt đầu tư vấn.</DialogDescription>
+                        </DialogHeader>
+                        <Form {...form}>
+                            <FormField
+                                control={form.control}
+                                name="fullname"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            Họ và tên <span className="text-red-500">*</span>
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Nhập họ và tên..." {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Email</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Nhập email..." {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="mobile"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            Số điện thoại
+                                            <span className="text-red-500">*</span>
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Nhập số điện thoại..." {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="company"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            Tên công ty
+                                            <span className="text-red-500">*</span>
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Nhập tên công ty..." {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="taxcode"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            Mã số thuế
+                                            <span className="text-red-500">*</span>
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Nhập mã số thuế..." {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button variant="outline">Hủy</Button>
-                            </DialogClose>
-                            <Button
-                                onClick={async () => {
-                                    const valid = await form.trigger();
-                                    if (valid) {
-                                        onSubmit();
-                                        setIsShowDialog(false);
-                                    }
-                                }}
-                            >
-                                Tiếp tục
-                            </Button>
-                        </DialogFooter>
-                    </Form>
-                </DialogContent>
-            </Dialog>
-        </div>
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button variant="outline">Hủy</Button>
+                                </DialogClose>
+                                <Button
+                                    onClick={async () => {
+                                        const valid = await form.trigger();
+                                        if (valid) {
+                                            onSubmit();
+                                            setIsShowDialog(false);
+                                        }
+                                    }}
+                                >
+                                    Tiếp tục
+                                </Button>
+                            </DialogFooter>
+                        </Form>
+                    </DialogContent>
+                </Dialog>
+            </div>
+        </>
     );
 }
