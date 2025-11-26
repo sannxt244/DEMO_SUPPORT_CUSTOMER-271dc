@@ -1,63 +1,5 @@
 'use client';
 
-// export default function RootLayout({ children }) {
-//     useEffect(() => {
-//         /**
-//          * Load file
-//          * @author NTSAN 08.06.2025
-//          */
-//         function _loadSource(tag, config) {
-//             var el = document.createElement(tag);
-//             if (config) {
-//                 for (let i in config) {
-//                     el[i] = config[i];
-//                 }
-//             }
-//             document.head.appendChild(el);
-//         }
-
-//         function getSessionUUID() {
-//             // Định nghĩa key để lưu trong sessionStorage
-//             const uuidKey = 'session_uuid';
-//             // Thử lấy UUID từ sessionStorage
-//             let sessionUUID = sessionStorage.getItem(uuidKey);
-//             // Nếu chưa có UUID trong session này
-//             if (!sessionUUID) {
-//                 // Tạo một UUID mới bằng API của trình duyệt
-//                 sessionUUID = crypto.randomUUID();
-
-//                 // Lưu UUID mới vào sessionStorage
-//                 sessionStorage.setItem(uuidKey, sessionUUID);
-//             }
-//             // Trả về UUID
-//             return sessionUUID;
-//         }
-
-//         _loadSource('script', {
-//             src: `https://amismisa.misacdn.net/support/core/1.0.0-release/core.js`,
-//             type: 'text/javascript',
-//             onload: async () => {
-//                 window.initAmisSupport({
-//                     clientId: '9ad06c08-71dd-11f0-912f-005056a60cf9',
-//                     company: 'CN3',
-//                     email: 'dev_cukcuk@gmail.com',
-//                     fullname: 'Trần Thị Hương Giang',
-//                     identityId: '34bee0d8-c9a0-4d24-8df7-7bd81e81e955',
-//                     mobile: '0973818181',
-//                     source: 'CUKCUK',
-//                     taxcode: ''
-//                 });
-//             }
-//         });
-//     }, []);
-
-//     return (
-//         <div className="flex flex-col min-h-screen px-6 bg-noise sm:px-12">
-//             {/* <LiveChatWidget license="19273572" /> */}
-//         </div>
-//     );
-// }
-
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -71,7 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -123,6 +65,27 @@ export default function RootLayout() {
         return sessionUUID;
     }
 
+    useEffect(() => {
+        /**
+         * Load file
+         * @author NTSAN 08.06.2025
+         */
+        function _loadSource(tag, config) {
+            var el = document.createElement(tag);
+            if (config) {
+                for (let i in config) {
+                    el[i] = config[i];
+                }
+            }
+            document.head.appendChild(el);
+        }
+
+        _loadSource('script', {
+            src: `https://support-misa.misacdn.net/1.0.0-release/core.js`,
+            type: 'text/javascript'
+        });
+    }, []);
+
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
@@ -133,7 +96,7 @@ export default function RootLayout() {
             taxcode: '',
             clientId: '2f4195dc-83fd-11f0-912f-005056a60cf9',
             identityId: '',
-            showTrigger: false,
+            showTrigger: true,
             source: 'AMIS_SUPPORT'
         }
     });
@@ -141,6 +104,7 @@ export default function RootLayout() {
     console.log(JSON.stringify(form.formState.errors));
 
     async function onSubmit() {
+      debugger
         if (_window && _window.initAmisSupport) {
             form.setValue('identityId', getSessionUUID());
             await _window.initAmisSupport(form.getValues());
@@ -151,127 +115,119 @@ export default function RootLayout() {
     }
 
     return (
-        <>
-            <Script src="https://support-misa.misacdn.net/1.0.0-release/core.js"></Script>
-            <div className="p-4">
-                <h3>MKT 1</h3>
-                <Dialog
-                    open={isShowDialog}
-                    onOpenChange={() => {
-                        if (_window && _window.AmisSupport && _window.AmisSupport.ChatWindow) {
-                            _window.AmisSupport.ChatWindow.show();
-                            return;
-                        }
+        <div className="p-4">
+            <h3>MKT 1</h3>
+            <Dialog
+                open={isShowDialog}
+                onOpenChange={(v) => {
+                    setIsShowDialog(v);
+                }}
+            >
+                <DialogTrigger asChild>
+                    <Button variant="outline">Tư vấn ngay</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Điền thông tin</DialogTitle>
+                        <DialogDescription>Điền các thông tin sau để bắt đầu tư vấn.</DialogDescription>
+                    </DialogHeader>
+                    <Form {...form}>
+                        <FormField
+                            control={form.control}
+                            name="fullname"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Họ và tên <span className="text-red-500">*</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Nhập họ và tên..." {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Email</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Nhập email..." {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="mobile"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Số điện thoại
+                                        <span className="text-red-500">*</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Nhập số điện thoại..." {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="company"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Tên công ty
+                                        <span className="text-red-500">*</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Nhập tên công ty..." {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="taxcode"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Mã số thuế
+                                        <span className="text-red-500">*</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Nhập mã số thuế..." {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
-                        setIsShowDialog(true);
-                    }}
-                >
-                    <DialogTrigger asChild>
-                        <Button variant="outline">Tư vấn ngay</Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                            <DialogTitle>Điền thông tin</DialogTitle>
-                            <DialogDescription>Điền các thông tin sau để bắt đầu tư vấn.</DialogDescription>
-                        </DialogHeader>
-                        <Form {...form}>
-                            <FormField
-                                control={form.control}
-                                name="fullname"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            Họ và tên <span className="text-red-500">*</span>
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Nhập họ và tên..." {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="email"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Email</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Nhập email..." {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="mobile"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            Số điện thoại
-                                            <span className="text-red-500">*</span>
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Nhập số điện thoại..." {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="company"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            Tên công ty
-                                            <span className="text-red-500">*</span>
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Nhập tên công ty..." {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="taxcode"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            Mã số thuế
-                                            <span className="text-red-500">*</span>
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Nhập mã số thuế..." {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <DialogFooter>
-                                <DialogClose asChild>
-                                    <Button variant="outline">Hủy</Button>
-                                </DialogClose>
-                                <Button
-                                    onClick={async () => {
-                                        const valid = await form.trigger();
-                                        if (valid) {
-                                            onSubmit();
-                                            setIsShowDialog(false);
-                                        }
-                                    }}
-                                >
-                                    Tiếp tục
-                                </Button>
-                            </DialogFooter>
-                        </Form>
-                    </DialogContent>
-                </Dialog>
-            </div>
-        </>
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <Button variant="outline">Hủy</Button>
+                            </DialogClose>
+                            <Button
+                                onClick={async () => {
+                                    const valid = await form.trigger();
+                                    if (valid) {
+                                        onSubmit();
+                                        setIsShowDialog(false);
+                                    }
+                                }}
+                            >
+                                Tiếp tục
+                            </Button>
+                        </DialogFooter>
+                    </Form>
+                </DialogContent>
+            </Dialog>
+        </div>
     );
 }
