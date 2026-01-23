@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>PC Multi-QR Decoder</title>
+    <!-- Thư viện giải mã QR -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f4f9; color: #333; padding: 20px; text-align: center; }
+        
+        /* Khu vực Upload/Dán ảnh */
+        #drop-zone {
+            border: 3px dashed #007bff;
+            border-radius: 10px;
+            padding: 40px;
+            background: #fff;
+            color: #555;
+            transition: 0.3s;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        #drop-zone:hover, #drop-zone.dragover { background: #e9f5ff; border-color: #0056b3; }
+        #drop-zone h3 { margin: 0; font-size: 20px; }
+        #drop-zone p { margin: 5px 0 0; color: #888; }
+
+        /* Kết quả */
+        #status-area { font-weight: bold; margin-bottom: 10px; font-size: 18px; }
+        .missing { color: #d32f2f; }
+        .success { color: #2e7d32; }
+
+        textarea { width: 100%; height: 300px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-family: monospace; font-size: 14px; }
+        
+        /* Canvas ẩn để xử lý ảnh */
+        canvas { display: none; }
+        
+        /* Nút reset */
+        button { background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #5a6268; }
+    </style>
+</head>
+<body>
+
+    <h2>2. MÁY THU (PC - DÁN ẢNH)</h2>
+
+    <!-- Khu vực kéo thả / dán -->
+    <div id="drop-zone" onclick="document.getElementById('file-input').click()">
+        <h3>Dán ảnh (Ctrl+V) hoặc Kéo thả ảnh vào đây</h3>
+        <p>Hỗ trợ ảnh chụp màn hình chứa nhiều mã QR cùng lúc</p>
+        <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="handleFile(this.files[0])">
+    </div>
+
+    <div id="status-area">Trạng thái: Đang chờ ảnh...</div>
+    <textarea id="result-area" placeholder="Văn bản sau khi ghép sẽ hiện ra tại đây..."></textarea>
+    <br>
+    <button onclick="resetAll()">Làm mới (Xóa hết dữ liệu)</button>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const statusArea = document.getElementById('status-area');
+        const resultArea = document.getElementById('result-area');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Bộ nhớ lưu trữ các mảnh đã giải mã
+        let parts = {}; 
+        let totalParts = 0;
+
+        // --- SỰ KIỆN DÁN (PASTE) ---
+        document.addEventListener('paste', (e) => {
+            const items = e.clipboardData.items;
+            for (let item of items) {
+                if (item.type.indexOf('image') !== -1) {
+                    const blob = item.getAsFile();
+                    handleFile(blob);
+                }
+            }
+        });
+
+        // --- SỰ KIỆN KÉO THẢ (DRAG & DROP) ---
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+
+        // --- XỬ LÝ FILE ẢNH ---
+        function handleFile(file) {
+            if (!file) return;
+            statusArea.innerText = "Đang xử lý ảnh...";
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => processImage(img);
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // --- THUẬT TOÁN QUÉT ĐA MÃ QR ---
+        function processImage(img) {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+
+            let foundInThisImage = 0;
+            let attempts = 0;
+            const maxAttempts = 50; // Giới hạn số vòng lặp để tránh treo máy
+
+            // Vòng lặp: Tìm QR -> Lưu -> Xóa vùng QR đó -> Tìm tiếp
+            while (attempts < maxAttempts) {
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                // Quét QR
+                const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
+
+                if (code) {
+                    foundInThisImage++;
+                    parseQRData(code.data);
+
+                    // XÓA mã QR vừa tìm thấy khỏi hình (tô đen đè lên nó)
+                    // Để lần quét sau thư viện sẽ tìm mã QR khác
+                    // Mở rộng vùng xóa một chút (+10px) để đảm bảo xóa sạch
+                    const loc = code.location;
+                    const minX = Math.min(loc.topLeftCorner.x, loc.bottomLeftCorner.x);
+                    const minY = Math.min(loc.topLeftCorner.y, loc.topRightCorner.y);
+                    const width = Math.max(loc.topRightCorner.x, loc.bottomRightCorner.x) - minX;
+                    const height = Math.max(loc.bottomLeftCorner.y, loc.bottomRightCorner.y) - minY;
+
+                    ctx.fillStyle = "black";
+                    ctx.fillRect(minX - 5, minY - 5, width + 10, height + 10);
+                } else {
+                    // Không tìm thấy thêm mã nào nữa
+                    break;
+                }
+                attempts++;
+            }
+
+            updateStatus(foundInThisImage);
+        }
+
+        // --- XỬ LÝ DỮ LIỆU QR ---
+        function parseQRData(dataString) {
+            // Format: Index|Total|Data
+            try {
+                const splitArr = dataString.split('|');
+                if (splitArr.length < 3) return;
+
+                const index = parseInt(splitArr[0]);
+                const total = parseInt(splitArr[1]);
+                const payload = splitArr.slice(2).join('|');
+
+                if (totalParts === 0) totalParts = total;
+                parts[index] = payload;
+            } catch (e) {
+                console.error("Lỗi format QR:", e);
+            }
+        }
+
+        // --- CẬP NHẬT TRẠNG THÁI ---
+        function updateStatus(foundCount) {
+            const currentCount = Object.keys(parts).length;
+            
+            // Tìm các mảnh thiếu
+            let missing = [];
+            for (let i = 1; i <= totalParts; i++) {
+                if (!parts[i]) missing.push(i);
+            }
+
+            if (missing.length === 0 && totalParts > 0) {
+                statusArea.innerHTML = `<span class="success">✅ Đã đủ 100% dữ liệu! Đang giải mã...</span>`;
+                decodeFinal();
+            } else {
+                let msg = `Đã tìm thấy ${currentCount}/${totalParts} mảnh. `;
+                if (missing.length > 0) {
+                    msg += `<span class="missing">Thiếu các phần: ${missing.join(', ')}</span>`;
+                }
+                if (foundCount > 0) {
+                    msg += ` (Vừa tìm thêm được ${foundCount} mã trong ảnh này)`;
+                } else {
+                    msg += ` (Không tìm thấy mã nào mới trong ảnh vừa tải lên)`;
+                }
+                statusArea.innerHTML = msg;
+            }
+        }
+
+        // --- GIẢI MÃ CUỐI CÙNG (BASE64 -> TEXT) ---
+        function decodeFinal() {
+            let fullBase64 = "";
+            for (let i = 1; i <= totalParts; i++) {
+                fullBase64 += parts[i];
+            }
+
+            try {
+                // Decode Base64 -> UTF8
+                const text = decodeURIComponent(escape(atob(fullBase64)));
+                resultArea.value = text;
+            } catch (e) {
+                resultArea.value = "LỖI GIẢI MÃ: Dữ liệu có thể bị hỏng hoặc sai định dạng Base64.\n" + e.message;
+            }
+        }
+
+        function resetAll() {
+            parts = {};
+            totalParts = 0;
+            resultArea.value = "";
+            statusArea.innerText = "Trạng thái: Đang chờ ảnh...";
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+        }
+    </script>
+</body>
+</html>
