@@ -2,203 +2,254 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>PC Multi-QR Decoder</title>
-    <!-- Thư viện giải mã QR -->
+    <title>Manual QR Crop & Scan</title>
+    <!-- Thư viện quét QR -->
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <!-- Thư viện giải nén -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f4f9; color: #333; padding: 20px; text-align: center; }
+        body { font-family: Arial, sans-serif; background: #333; color: #fff; padding: 20px; text-align: center; }
         
-        /* Khu vực Upload/Dán ảnh */
-        #drop-zone {
-            border: 3px dashed #007bff;
-            border-radius: 10px;
-            padding: 40px;
-            background: #fff;
-            color: #555;
-            transition: 0.3s;
-            cursor: pointer;
-            margin-bottom: 20px;
+        /* Khu vực điều khiển */
+        .controls { margin-bottom: 15px; background: #444; padding: 10px; border-radius: 8px;}
+        input[type="file"] { display: none; }
+        .btn { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px; font-size: 16px; }
+        .btn:hover { background: #0056b3; }
+        
+        /* Khu vực hiển thị ảnh và vẽ */
+        #canvas-wrapper {
+            position: relative;
+            display: inline-block;
+            border: 2px solid #555;
+            background: #000;
+            cursor: crosshair; /* Con trỏ hình chữ thập */
+            overflow: hidden;
+            max-width: 100%;
         }
-        #drop-zone:hover, #drop-zone.dragover { background: #e9f5ff; border-color: #0056b3; }
-        #drop-zone h3 { margin: 0; font-size: 20px; }
-        #drop-zone p { margin: 5px 0 0; color: #888; }
+        
+        canvas { display: block; max-width: 100%; }
+
+        /* Khung selection (vùng chọn) */
+        #selection-box {
+            position: absolute;
+            border: 2px dashed #0f0;
+            background: rgba(0, 255, 0, 0.2);
+            display: none;
+            pointer-events: none; /* Để chuột click xuyên qua */
+        }
 
         /* Kết quả */
-        #status-area { font-weight: bold; margin-bottom: 10px; font-size: 18px; }
-        .missing { color: #d32f2f; }
-        .success { color: #2e7d32; }
-
-        textarea { width: 100%; height: 300px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-family: monospace; font-size: 14px; }
+        #status { font-size: 18px; margin: 10px 0; color: yellow; font-weight: bold; min-height: 25px;}
+        textarea { width: 90%; height: 200px; margin-top: 10px; padding: 10px; font-family: monospace; border-radius: 5px;}
         
-        /* Canvas ẩn để xử lý ảnh */
-        canvas { display: none; }
-        
-        /* Nút reset */
-        button { background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-        button:hover { background: #5a6268; }
+        .part-indicator { display: inline-block; margin: 2px; padding: 5px 10px; background: #555; color: #ccc; border-radius: 3px; font-size: 12px; }
+        .part-indicator.have { background: #28a745; color: #fff; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <h2>2. MÁY THU (PC - DÁN ẢNH)</h2>
+    <h2>MÁY THU: KHOANH VÙNG THỦ CÔNG</h2>
 
-    <!-- Khu vực kéo thả / dán -->
-    <div id="drop-zone" onclick="document.getElementById('file-input').click()">
-        <h3>Dán ảnh (Ctrl+V) hoặc Kéo thả ảnh vào đây</h3>
-        <p>Hỗ trợ ảnh chụp màn hình chứa nhiều mã QR cùng lúc</p>
-        <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="handleFile(this.files[0])">
+    <div class="controls">
+        <button class="btn" onclick="document.getElementById('fileInput').click()">1. Tải ảnh chụp màn hình lên</button>
+        <input type="file" id="fileInput" accept="image/*" onchange="handleImage(this.files[0])">
+        <p style="font-size: 14px; margin-top: 5px; color: #ccc">Hướng dẫn: Dùng chuột KÉO và THẢ bao quanh từng mã QR để quét.</p>
     </div>
 
-    <div id="status-area">Trạng thái: Đang chờ ảnh...</div>
-    <textarea id="result-area" placeholder="Văn bản sau khi ghép sẽ hiện ra tại đây..."></textarea>
-    <br>
-    <button onclick="resetAll()">Làm mới (Xóa hết dữ liệu)</button>
+    <div id="status">Vui lòng tải ảnh...</div>
+    <div id="parts-list"></div>
 
-    <canvas id="canvas"></canvas>
+    <!-- Khu vực vẽ ảnh -->
+    <div id="canvas-wrapper">
+        <canvas id="mainCanvas"></canvas>
+        <div id="selection-box"></div>
+    </div>
+
+    <br>
+    <textarea id="result" placeholder="Kết quả văn bản sẽ tự động ghép vào đây..."></textarea>
+    <br>
+    <button class="btn" onclick="resetAll()" style="background: #6c757d; margin-top:10px;">Xóa làm lại</button>
 
     <script>
-        const dropZone = document.getElementById('drop-zone');
-        const statusArea = document.getElementById('status-area');
-        const resultArea = document.getElementById('result-area');
-        const canvas = document.getElementById('canvas');
+        const canvas = document.getElementById('mainCanvas');
         const ctx = canvas.getContext('2d');
+        const wrapper = document.getElementById('canvas-wrapper');
+        const selectionBox = document.getElementById('selection-box');
+        const statusDiv = document.getElementById('status');
+        const resultArea = document.getElementById('result');
+        const partsListDiv = document.getElementById('parts-list');
 
-        // Bộ nhớ lưu trữ các mảnh đã giải mã
-        let parts = {}; 
+        let imgElement = new Image();
+        let parts = {};
         let totalParts = 0;
+        
+        // Biến xử lý kéo chuột
+        let isDown = false;
+        let startX, startY;
+        let scale = 1; // Tỉ lệ hiển thị nếu ảnh quá to
 
-        // --- SỰ KIỆN DÁN (PASTE) ---
-        document.addEventListener('paste', (e) => {
-            const items = e.clipboardData.items;
-            for (let item of items) {
-                if (item.type.indexOf('image') !== -1) {
-                    const blob = item.getAsFile();
-                    handleFile(blob);
-                }
-            }
-        });
-
-        // --- SỰ KIỆN KÉO THẢ (DRAG & DROP) ---
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
-        });
-
-        // --- XỬ LÝ FILE ẢNH ---
-        function handleFile(file) {
-            if (!file) return;
-            statusArea.innerText = "Đang xử lý ảnh...";
+        function handleImage(file) {
+            if(!file) return;
             const reader = new FileReader();
             reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => processImage(img);
-                img.src = e.target.result;
+                imgElement.src = e.target.result;
+                imgElement.onload = () => {
+                    // Reset
+                    canvas.width = imgElement.width;
+                    canvas.height = imgElement.height;
+                    ctx.drawImage(imgElement, 0, 0);
+                    statusDiv.innerText = "Hãy khoanh vùng một mã QR!";
+                    
+                    // Tính scale hiển thị (CSS width / Real width)
+                    // Ở đây ta dùng trực tiếp toạ độ thực của canvas để đơn giản hoá
+                    wrapper.style.width = imgElement.width + "px";
+                    wrapper.style.height = imgElement.height + "px";
+                }
             };
             reader.readAsDataURL(file);
         }
 
-        // --- THUẬT TOÁN QUÉT ĐA MÃ QR ---
-        function processImage(img) {
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
+        // --- SỰ KIỆN CHUỘT (VẼ VÙNG CHỌN) ---
+        
+        wrapper.addEventListener('mousedown', (e) => {
+            isDown = true;
+            const rect = wrapper.getBoundingClientRect();
+            // Lấy toạ độ chuột so với canvas
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+            
+            selectionBox.style.left = startX + 'px';
+            selectionBox.style.top = startY + 'px';
+            selectionBox.style.width = '0px';
+            selectionBox.style.height = '0px';
+            selectionBox.style.display = 'block';
+            selectionBox.style.borderColor = '#0f0'; // Màu xanh chờ quét
+        });
 
-            let foundInThisImage = 0;
-            let attempts = 0;
-            const maxAttempts = 50; // Giới hạn số vòng lặp để tránh treo máy
+        wrapper.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            const rect = wrapper.getBoundingClientRect();
+            const currentX = e.clientX - rect.left;
+            const currentY = e.clientY - rect.top;
 
-            // Vòng lặp: Tìm QR -> Lưu -> Xóa vùng QR đó -> Tìm tiếp
-            while (attempts < maxAttempts) {
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                // Quét QR
-                const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
+            const width = currentX - startX;
+            const height = currentY - startY;
+
+            selectionBox.style.width = Math.abs(width) + 'px';
+            selectionBox.style.height = Math.abs(height) + 'px';
+            
+            if (width < 0) selectionBox.style.left = currentX + 'px';
+            if (height < 0) selectionBox.style.top = currentY + 'px';
+        });
+
+        wrapper.addEventListener('mouseup', (e) => {
+            isDown = false;
+            // Tiến hành quét vùng vừa chọn
+            scanSelection();
+            // Ẩn vùng chọn sau 0.5s cho đẹp
+            setTimeout(() => {
+                if(!isDown) selectionBox.style.display = 'none';
+            }, 500);
+        });
+
+        // --- XỬ LÝ QUÉT QR TRONG VÙNG CHỌN ---
+        function scanSelection() {
+            // Lấy toạ độ và kích thước từ selectionBox
+            const x = parseInt(selectionBox.style.left);
+            const y = parseInt(selectionBox.style.top);
+            const w = parseInt(selectionBox.style.width);
+            const h = parseInt(selectionBox.style.height);
+
+            if (w < 20 || h < 20) return; // Quá bé không quét
+
+            try {
+                // Cắt dữ liệu ảnh từ Canvas tại vị trí đó
+                const imageData = ctx.getImageData(x, y, w, h);
+                
+                // Gửi cho thư viện jsQR giải mã
+                const code = jsQR(imageData.data, w, h, { inversionAttempts: "dontInvert" });
 
                 if (code) {
-                    foundInThisImage++;
-                    parseQRData(code.data);
-
-                    // XÓA mã QR vừa tìm thấy khỏi hình (tô đen đè lên nó)
-                    // Để lần quét sau thư viện sẽ tìm mã QR khác
-                    // Mở rộng vùng xóa một chút (+10px) để đảm bảo xóa sạch
-                    const loc = code.location;
-                    const minX = Math.min(loc.topLeftCorner.x, loc.bottomLeftCorner.x);
-                    const minY = Math.min(loc.topLeftCorner.y, loc.topRightCorner.y);
-                    const width = Math.max(loc.topRightCorner.x, loc.bottomRightCorner.x) - minX;
-                    const height = Math.max(loc.bottomLeftCorner.y, loc.bottomRightCorner.y) - minY;
-
-                    ctx.fillStyle = "black";
-                    ctx.fillRect(minX - 5, minY - 5, width + 10, height + 10);
+                    processQRData(code.data);
+                    selectionBox.style.borderColor = "blue"; // Đổi màu báo hiệu thành công
                 } else {
-                    // Không tìm thấy thêm mã nào nữa
-                    break;
+                    statusDiv.innerText = "❌ Không tìm thấy mã QR trong vùng chọn. Thử lại!";
+                    statusDiv.style.color = "red";
+                    selectionBox.style.borderColor = "red";
                 }
-                attempts++;
-            }
-
-            updateStatus(foundInThisImage);
-        }
-
-        // --- XỬ LÝ DỮ LIỆU QR ---
-        function parseQRData(dataString) {
-            // Format: Index|Total|Data
-            try {
-                const splitArr = dataString.split('|');
-                if (splitArr.length < 3) return;
-
-                const index = parseInt(splitArr[0]);
-                const total = parseInt(splitArr[1]);
-                const payload = splitArr.slice(2).join('|');
-
-                if (totalParts === 0) totalParts = total;
-                parts[index] = payload;
-            } catch (e) {
-                console.error("Lỗi format QR:", e);
+            } catch (err) {
+                console.error(err);
             }
         }
 
-        // --- CẬP NHẬT TRẠNG THÁI ---
-        function updateStatus(foundCount) {
-            const currentCount = Object.keys(parts).length;
-            
-            // Tìm các mảnh thiếu
-            let missing = [];
-            for (let i = 1; i <= totalParts; i++) {
-                if (!parts[i]) missing.push(i);
+        // --- XỬ LÝ DỮ LIỆU ---
+        function processQRData(dataStr) {
+            // Format mong đợi: Index|Total|CompressedData
+            const partsArr = dataStr.split('|');
+            if (partsArr.length < 3) {
+                statusDiv.innerText = "⚠️ Mã QR không đúng định dạng tool này!";
+                return;
             }
 
-            if (missing.length === 0 && totalParts > 0) {
-                statusArea.innerHTML = `<span class="success">✅ Đã đủ 100% dữ liệu! Đang giải mã...</span>`;
-                decodeFinal();
+            const idx = parseInt(partsArr[0]);
+            const total = parseInt(partsArr[1]);
+            const content = partsArr.slice(2).join('|');
+
+            if (totalParts === 0) {
+                totalParts = total;
+                renderPartsList();
+            }
+
+            // Lưu dữ liệu
+            if (!parts[idx]) {
+                parts[idx] = content;
+                statusDiv.innerText = `✅ Đã nhận phần ${idx}/${total}`;
+                statusDiv.style.color = "#0f0";
+                
+                // Update giao diện các ô vuông nhỏ
+                document.getElementById(`part-box-${idx}`).classList.add('have');
+                
+                // Thử ghép và giải mã
+                checkAndDecode();
             } else {
-                let msg = `Đã tìm thấy ${currentCount}/${totalParts} mảnh. `;
-                if (missing.length > 0) {
-                    msg += `<span class="missing">Thiếu các phần: ${missing.join(', ')}</span>`;
-                }
-                if (foundCount > 0) {
-                    msg += ` (Vừa tìm thêm được ${foundCount} mã trong ảnh này)`;
-                } else {
-                    msg += ` (Không tìm thấy mã nào mới trong ảnh vừa tải lên)`;
-                }
-                statusArea.innerHTML = msg;
+                statusDiv.innerText = `⚠️ Phần ${idx} này đã quét rồi!`;
+                statusDiv.style.color = "orange";
             }
         }
 
-        // --- GIẢI MÃ CUỐI CÙNG (BASE64 -> TEXT) ---
-        function decodeFinal() {
-            let fullBase64 = "";
-            for (let i = 1; i <= totalParts; i++) {
-                fullBase64 += parts[i];
+        function renderPartsList() {
+            partsListDiv.innerHTML = "";
+            for(let i=1; i<=totalParts; i++) {
+                const span = document.createElement("span");
+                span.id = `part-box-${i}`;
+                span.className = "part-indicator";
+                span.innerText = `P${i}`;
+                partsListDiv.appendChild(span);
             }
+        }
 
-            try {
-                // Decode Base64 -> UTF8
-                const text = decodeURIComponent(escape(atob(fullBase64)));
-                resultArea.value = text;
-            } catch (e) {
-                resultArea.value = "LỖI GIẢI MÃ: Dữ liệu có thể bị hỏng hoặc sai định dạng Base64.\n" + e.message;
+        function checkAndDecode() {
+            // Kiểm tra xem đủ chưa
+            const currentCount = Object.keys(parts).length;
+            if (currentCount === totalParts) {
+                statusDiv.innerText = "🎉 ĐÃ ĐỦ! ĐANG GIẢI MÃ...";
+                
+                let compressedStr = "";
+                for(let i=1; i<=totalParts; i++) {
+                    compressedStr += parts[i];
+                }
+
+                try {
+                    // Giải nén LZString (tương thích với code Sender nén trước đó)
+                    let text = LZString.decompressFromBase64(compressedStr);
+                    // Nếu không nén thì text sẽ là null, ta thử decode Base64 thường
+                    if (!text) text = decodeURIComponent(escape(atob(compressedStr)));
+                    
+                    resultArea.value = text;
+                    statusDiv.innerText = "✅ HOÀN TẤT!";
+                } catch (e) {
+                    resultArea.value = "Lỗi giải mã: " + e.message;
+                }
             }
         }
 
@@ -206,8 +257,8 @@
             parts = {};
             totalParts = 0;
             resultArea.value = "";
-            statusArea.innerText = "Trạng thái: Đang chờ ảnh...";
-            ctx.clearRect(0,0,canvas.width, canvas.height);
+            partsListDiv.innerHTML = "";
+            statusDiv.innerText = "Sẵn sàng";
         }
     </script>
 </body>
