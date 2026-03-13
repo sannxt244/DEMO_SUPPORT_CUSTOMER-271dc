@@ -17,10 +17,6 @@ export default function RootLayout() {
     }, [message]);
 
     useEffect(() => {
-        const savedLang = localStorage.getItem(STORAGE_KEY);
-        if (savedLang) {
-            setLanguage(savedLang);
-        }
         /**
          * Load file
          * @author NTSAN 08.06.2025
@@ -39,6 +35,10 @@ export default function RootLayout() {
             src: `https://testcdnamisapp.misacdn.net/support/core/1.0.0-testonline/core.js`,
             type: 'text/javascript',
             onload: () => {
+                const savedLang = localStorage.getItem(STORAGE_KEY);
+                if (savedLang) {
+                    setLanguage(savedLang);
+                }
                 (window as any).initAmisSupport({
                     // clientId: '9ad06c08-71dd-11f0-912f-005056a60cf9',
                     clientId: '1',
