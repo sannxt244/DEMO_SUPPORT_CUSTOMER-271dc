@@ -50,7 +50,7 @@ export default function RootLayout() {
                     source: '1',
                     taxcode: '0108767234',
                     blacklistQueryParams: ['token'],
-                    language: language ? language : undefined
+                    language: savedLang ? savedLang : undefined
                 });
 
                 const amisSupport = (window as any).AmisSupport;
