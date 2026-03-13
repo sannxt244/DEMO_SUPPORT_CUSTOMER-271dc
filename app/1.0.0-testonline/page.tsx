@@ -79,8 +79,11 @@ export default function RootLayout() {
         // ✅ Set state
         setLanguage(newLang);
 
-        // ✅ Set localStorage
-        localStorage.setItem(STORAGE_KEY, newLang);
+        if (newLang) {
+            localStorage.setItem(STORAGE_KEY, newLang);
+        } else {
+            localStorage.removeItem(STORAGE_KEY);
+        }
 
         // ✅ Reload lại trang
         window.location.reload();

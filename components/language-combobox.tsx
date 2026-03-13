@@ -24,6 +24,7 @@ type Language = {
 }
 
 const languages: Language[] = [
+  { value: "", label: "Không có ngôn ngữ" },
   { value: "vi", label: "🇻🇳 Tiếng Việt" },
   { value: "en", label: "🇺🇸 English" },
   { value: "ja", label: "🇯🇵 日本語" },
