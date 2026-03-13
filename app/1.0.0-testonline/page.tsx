@@ -21,9 +21,6 @@ export default function RootLayout() {
         if (savedLang) {
             setLanguage(savedLang);
         }
-    }, []);
-
-    useEffect(() => {
         /**
          * Load file
          * @author NTSAN 08.06.2025
