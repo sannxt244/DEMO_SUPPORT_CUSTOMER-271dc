@@ -49,7 +49,6 @@ export default function RootLayout() {
                     taxcode: '0108767234',
                     blacklistQueryParams: ['token'],
                     language: savedLang ? savedLang : undefined,
-                    skipInitChatForm: true
                 });
 
                 const amisSupport = (window as any).AmisSupport;
