@@ -50,8 +50,7 @@ export default function RootLayout() {
             onload: () => {
                 (window as any).initAmisSupport({
                     clientId: '9ad06c08-71dd-11f0-912f-005056a60cf9',
-                    identityId: identityId,
-                    defaultTitle: "AMIS Súp lơ"
+                    identityId: identityId
                 });
             }
         });
