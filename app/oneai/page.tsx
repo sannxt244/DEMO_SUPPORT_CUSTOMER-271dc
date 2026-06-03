@@ -33,7 +33,7 @@ export default function RootLayout() {
                     AppKey: '4eC39HqLyjWDarjtT1zdp7dc'
                 });
                 instance.OnReady(() => {
-                  window.test= instance
+                  // window.test= instance
                 })
             }
         });
