@@ -1,10 +1,17 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
-import "./page.css";
+import { useEffect, useRef, useState } from 'react';
+import './page.css';
 
 export default function RootLayout() {
+    const [message, setMessage] = useState('');
+    const messageRef = useRef(message);
+
+    useEffect(() => {
+        messageRef.current = message;
+    }, [message]);
+
     useEffect(() => {
         /**
          * Load file
@@ -41,6 +48,18 @@ export default function RootLayout() {
                 amisSupport.ChatWindow?.on('update_unread', (data) => {});
             }
         });
+        const showWithMessage = (e: KeyboardEvent) => {
+            if (e.key === 'Enter') {
+                (window as any).AmisSupport?.ChatWindow?.showWithMessage(messageRef.current);
+                setMessage('');
+            }
+        };
+
+        window.addEventListener('keydown', showWithMessage);
+
+        return () => {
+            window.removeEventListener('keydown', showWithMessage);
+        };
     }, []);
 
     return (
@@ -257,6 +276,8 @@ export default function RootLayout() {
                     <div className="relative w-[766px]">
                         <div className="absolute top-1/2 left-20 right-4 transform -translate-y-1/2 h-8">
                             <input
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
                                 type="text"
                                 placeholder="Nhập câu hỏi của bạn tại đây..."
                                 className="h-full appearance-none border-none outline-none bg-transparent p-0 m-0"
