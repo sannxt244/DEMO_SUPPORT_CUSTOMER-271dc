@@ -17,26 +17,6 @@ const CONTEXT_TEMPLATES = [
     }
 ];
 
-declare global {
-    interface Window {
-        AmisChat: {
-            attachContextMessage: (data: {
-                userId: string;
-                items: Array<{
-                    itemType: string;
-                    objectType: string;
-                    appLogo: string;
-                    title: string;
-                    subtitle: string;
-                    actionUrl: string;
-                }>;
-            }) => Promise<void>;
-
-            show: (data: { userId: string }) => Promise<void>;
-        };
-    }
-}
-
 export default function ContextMessageForm() {
     const [userId, setUserId] = useState('amis-id-001');
 
@@ -118,9 +98,9 @@ export default function ContextMessageForm() {
                 <label className="text-sm font-medium">Chọn context</label>
 
                 <div className="flex gap-3 overflow-x-auto pb-2">
-                    {CONTEXT_TEMPLATES.map((item) => (
+                    {CONTEXT_TEMPLATES.map((item, index) => (
                         <button
-                            key={item.id}
+                            key={index}
                             type="button"
                             onClick={() => {
                                 setForm((prev) => ({

@@ -12,7 +12,7 @@ declare global {
     interface Window {
         AmisChat: {
             init: (options: {}) => void;
-            show: () => void;
+            show: (options?: { userId: string }) => void;
             setAuth: (options: { sessionId: string }) => void;
             attachContextMessage: (options: {
                 userId: string;
