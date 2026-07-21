@@ -4,12 +4,14 @@ import { Button } from '@/components/ui/button';
 import { useEffect, useRef, useState } from 'react';
 import './page.css';
 import { LanguageCombobox } from 'components/language-combobox';
+import { useSearchParams } from 'next/navigation';
 const STORAGE_KEY = 'app-language';
 
 export default function RootLayout() {
     const [message, setMessage] = useState('');
     const messageRef = useRef(message);
     const [language, setLanguage] = useState('');
+    const searchParams = useSearchParams();
 
     // Sync ref mỗi khi message thay đổi
     useEffect(() => {
@@ -39,16 +41,20 @@ export default function RootLayout() {
                 if (savedLang) {
                     setLanguage(savedLang);
                 }
+
+                const identityId = searchParams.get('identityId');
+                const initForm = searchParams.get('initForm') == 'true' ? true : false;
+
                 (window as any).initAmisSupport({
                     // clientId: '9ad06c08-71dd-11f0-912f-005056a60cf9',
                     clientId: '1',
                     company: '1',
                     email: '1',
                     fullname: 'Lê Hoàng Hiếu',
-                    identityId: '1',
+                    identityId: identityId || '1',
                     mobile: '1',
                     source: '1',
-                    taxcode: '0108767234',
+                    taxcode: !initForm ? '0108767234' : undefined,
                     blacklistQueryParams: ['token'],
                     language: savedLang ? savedLang : undefined
                 });
